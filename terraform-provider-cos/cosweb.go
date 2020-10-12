@@ -46,6 +46,7 @@ type Bucket struct{
 	Name string `json:"name"`
 	Description string `json:"description"`
 	CosInstanceGUID uint `json:"cosInstanceGUID"`
+	ID int `json:"id"`
 }
 
 func (c CosWeb) Initialize(apiKey string, bearer string,endpoint string, protocol string, sslcheck bool)(* CosWeb){
@@ -226,7 +227,7 @@ func (c CosWeb) CreateBucket(cosInstanceId int, bucketName string, bucketDescrip
 	headers["Authorization"]="Bearer "+c.BearerToken
 
 	
-	var b Bucket = Bucket{bucketName,bucketDescription,uint(cosInstanceId)}
+	var b Bucket = Bucket{bucketName,bucketDescription,uint(cosInstanceId),0}
 	payload := new(bytes.Buffer)
 	json.NewEncoder(payload).Encode(b)
 	response,err:=c.CallRest(url,headers,method,payload)
@@ -235,11 +236,9 @@ func (c CosWeb) CreateBucket(cosInstanceId int, bucketName string, bucketDescrip
 	}
 	body, _ := ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
+	log.Printf("[DEBUG] status : ",response.StatusCode)
 	//IBM cloud sent a success return code
 	if response.StatusCode >= 200 && response.StatusCode < 300{
-		
-		log.Printf("status : ",response.StatusCode)
-	
 	_ = json.Unmarshal(body, &b)
 	log.Printf("body : ",b)
 	}
@@ -309,7 +308,7 @@ func (c CosWeb) ModifyBucket(cosInstanceId int,bucketId int, bucketName string, 
 	headers["Authorization"]="Bearer "+c.BearerToken
 
 	
-	var b Bucket = Bucket{bucketName,bucketDescription,uint(cosInstanceId)}
+	var b Bucket = Bucket{bucketName,bucketDescription,uint(cosInstanceId),0}
 	payload := new(bytes.Buffer)
 	json.NewEncoder(payload).Encode(b)
 	response,err:=c.CallRest(url,headers,method,payload)
@@ -340,7 +339,7 @@ func (c CosWeb) DeleteBucket(cosInstanceId int,bucketId int, bucketName string, 
 	headers["Authorization"]="Bearer "+c.BearerToken
 
 	
-	var b Bucket = Bucket{bucketName,bucketDescription,uint(cosInstanceId)}
+	var b Bucket = Bucket{bucketName,bucketDescription,uint(cosInstanceId),0}
 	payload := new(bytes.Buffer)
 	json.NewEncoder(payload).Encode(b)
 	response,err:=c.CallRest(url,headers,method,payload)
