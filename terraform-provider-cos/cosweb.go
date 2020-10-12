@@ -37,6 +37,7 @@ type CosInstance struct{
 	Description string `json:"description"`
 	ResourceGroup string `json:"resourceGroup"`
 	ResourcePlanId string `json:"resourcePlanId"`
+	ID int `json:"id"`
 	//CreateAt string `json:-"`
 }
 
@@ -71,6 +72,33 @@ func(c CosWeb) CallRest(url string,headers map[string]string,method string,paylo
 	return response,err
 }
 
+
+
+//GetBucket method call cosweb microservice to get a bucket from cosweb database
+//It expects apikey, the cos instance id, bucket name and bucket description as parameters
+//It returns Bucket struct or an error
+func (c CosWeb) GetAllCosInstances()([]CosInstance,error){
+	url:=c.Protocol+"://"+c.Endpoint+"/cosinstances"
+	method:="GET"
+	var headers =make(map[string]string)
+	headers["x-api-key"]=c.ApiKey
+	headers["Authorization"]="Bearer "+c.BearerToken
+	payload :=  bytes.Buffer{}
+	var cos []CosInstance
+	response,err:=c.CallRest(url,headers,method,&payload)
+	if err != nil{
+		return []CosInstance{},err
+	}
+	body, _ := ioutil.ReadAll(response.Body)
+	defer response.Body.Close()
+	//IBM cloud sent a success return code
+	if response.StatusCode >= 200 && response.StatusCode < 300{
+		log.Printf("body : %s",response.Body)
+	
+	_ = json.Unmarshal(body, &cos)
+	}
+	return cos,err
+}
 //CreateCosInstance method call cosweb microservice to create a cos instance on IBM cloud and register it in cosweb database
 //It expects the cos instance name, description, resource group and resource plan id as parameters
 //It returns CosInstance struct or an error
@@ -80,7 +108,7 @@ func (c CosWeb)CreateCosInstance(cosInstanceName string,cosInstanceDescription s
 	headers:=make(map[string]string)
 	headers["x-api-key"]=c.ApiKey
 	headers["Authorization"]="Bearer "+c.BearerToken
-	var instance CosInstance = CosInstance{cosInstanceName,cosInstanceDescription,cosInstanceResourceGroup,cosInstanceResourcePlanId}
+	var instance CosInstance = CosInstance{cosInstanceName,cosInstanceDescription,cosInstanceResourceGroup,cosInstanceResourcePlanId,0}
 	payload := new(bytes.Buffer)
 	json.NewEncoder(payload).Encode(instance)
 	response,err:=c.CallRest(url,headers,method,payload)
@@ -138,7 +166,7 @@ func (c CosWeb)ModifyCosInstance(cosInstanceId int,cosInstanceName string,cosIns
 	headers:=make(map[string]string)
 	headers["x-api-key"]=c.ApiKey
 	headers["Authorization"]="Bearer "+c.BearerToken
-	var instance CosInstance = CosInstance{cosInstanceName,cosInstanceDescription,cosInstanceResourceGroup,cosInstanceResourcePlanId}
+	var instance CosInstance = CosInstance{cosInstanceName,cosInstanceDescription,cosInstanceResourceGroup,cosInstanceResourcePlanId,0}
 	payload := new(bytes.Buffer)
 	json.NewEncoder(payload).Encode(instance)
 	response,err:=c.CallRest(url,headers,method,payload)
@@ -167,7 +195,7 @@ func (c CosWeb)DeleteCosInstance(cosInstanceId int,cosInstanceName string,cosIns
 	headers:=make(map[string]string)
 	headers["x-api-key"]=c.ApiKey
 	headers["Authorization"]="Bearer "+c.BearerToken
-	var instance CosInstance = CosInstance{cosInstanceName,cosInstanceDescription,cosInstanceResourceGroup,cosInstanceResourcePlanId}
+	var instance CosInstance = CosInstance{cosInstanceName,cosInstanceDescription,cosInstanceResourceGroup,cosInstanceResourcePlanId,0}
 	payload := new(bytes.Buffer)
 	json.NewEncoder(payload).Encode(instance)
 	response,err:=c.CallRest(url,headers,method,payload)
