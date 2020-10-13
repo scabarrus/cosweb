@@ -9,6 +9,7 @@ import(
 	"io/ioutil"
 	"encoding/json"
 	"bytes"
+	"errors"
 )
 
 //IBMToken struct store all attributes of the token provided by IBM IAM endpoint.
@@ -241,7 +242,10 @@ func (c CosWeb) CreateBucket(cosInstanceId int, bucketName string, bucketDescrip
 	if response.StatusCode >= 200 && response.StatusCode < 300{
 	_ = json.Unmarshal(body, &b)
 	log.Printf("body : ",b)
+	}else{
+		err=errors.New("Impossible to create the bucket")
 	}
+
 	return b,err
 }
 
