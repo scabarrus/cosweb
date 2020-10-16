@@ -13,8 +13,8 @@ terraform {
 provider "cos" {
  #version = "1.0.0"
   
-  apikey = "KBHGG68XYbONIYiNXS71vpilBr9mYkBGHWVBhB397z0n"
-  bearer = "KBHGG68XYbONIYiNXS71vpilBr9mYkBGHWVBhB397z0n"
+  apikey = "KBHGG68oooYkBGHWVBhB397z0n"
+  bearer = "KBHGG68XYbONooor9mYkBGHWVBhB397z0n"
   endpoint = "192.168.169.129:30061"
   # if you have a self-signed cert
   protocol = "http"
