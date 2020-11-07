@@ -1,0 +1,7 @@
+- task: InvokeRESTAPI@1
+  inputs:
+    connectionType: 'connectedServiceName'
+    method: 'POST'
+    body: '[{"name":"hostname", "value":"$(VMName)"},{"name":''vcpu'',"value","$(VMName)"},{"name":"vram","value":"$(vRAM)"}]'
+    urlSuffix: 'https://www.google.fr'
+    waitForCompletion: 'false'
